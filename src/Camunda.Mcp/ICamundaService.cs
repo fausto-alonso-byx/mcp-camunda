@@ -65,4 +65,14 @@ internal interface ICamundaService
         string messageName,
         CancellationToken cancellationToken = default
     );
+
+    Task<string> GetProcessDefinitionXmlAsync(
+        string processDefinitionIdOrKey,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<string> GetDecisionDefinitionXmlAsync(
+        string decisionDefinitionIdOrKey,
+        CancellationToken cancellationToken = default
+    );
 }

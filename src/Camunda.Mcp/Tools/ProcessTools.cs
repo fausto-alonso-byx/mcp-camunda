@@ -227,4 +227,36 @@ internal sealed class ProcessTools
 
         return result;
     }
+
+    [
+        McpServerTool,
+        Description(
+            "Retrieve the BPMN 2.0 XML for a process definition in the Camunda process engine. You can provide either the process definition id or key."
+        )
+    ]
+    public static async Task<string> GetDefinitionXml(
+        ICamundaService camunda,
+        [Description("The unique id or key of the BPMN process definition.")]
+            string processDefinitionIdOrKey
+    )
+    {
+        string result = await camunda.GetProcessDefinitionXmlAsync(processDefinitionIdOrKey);
+        return result;
+    }
+
+    [
+        McpServerTool,
+        Description(
+            "Retrieve the DMN XML for a decision definition in the Camunda process engine. You can provide either the decision definition id or key."
+        )
+    ]
+    public static async Task<string> GetDecisionDefinitionXml(
+        ICamundaService camunda,
+        [Description("The unique id or key of the DMN decision definition.")]
+            string decisionDefinitionIdOrKey
+    )
+    {
+        string result = await camunda.GetDecisionDefinitionXmlAsync(decisionDefinitionIdOrKey);
+        return result;
+    }
 }

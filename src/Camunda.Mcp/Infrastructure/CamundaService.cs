@@ -902,6 +902,112 @@ internal sealed class CamundaService(ICamundaClient client, ILogger<CamundaServi
         );
     }
 
+    public async Task<string> GetProcessDefinitionXmlAsync(
+        string processDefinitionIdOrKey,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ProcessDefinitionDiagramDto? definitionXml;
+
+        try
+        {
+            definitionXml = await client.GetProcessDefinitionBpmn20XmlAsync(
+                processDefinitionIdOrKey,
+                cancellationToken
+            );
+        }
+        catch (Exception idException)
+        {
+            logger.LogWarning(
+                idException,
+                "Failed to get process definition XML by id: {ProcessDefinitionIdOrKey}. Trying by key.",
+                processDefinitionIdOrKey
+            );
+
+            try
+            {
+                definitionXml = await client.GetProcessDefinitionBpmn20XmlByKeyAsync(
+                    processDefinitionIdOrKey,
+                    cancellationToken
+                );
+            }
+            catch (Exception keyException)
+            {
+                logger.LogError(
+                    keyException,
+                    "Failed to get process definition XML by id or key: {ProcessDefinitionIdOrKey}",
+                    processDefinitionIdOrKey
+                );
+
+                return Failure(
+                    "Failed to get process definition XML, because: " + keyException.Message
+                );
+            }
+        }
+
+        return Frame(
+            $"""
+            <bpmn_definition_xml>
+                <definition_id>{definitionXml.Id}</definition_id>
+                <xml><![CDATA[{EscapeCData(definitionXml.Bpmn20Xml)}]]></xml>
+            </bpmn_definition_xml>
+            """
+        );
+    }
+
+    public async Task<string> GetDecisionDefinitionXmlAsync(
+        string decisionDefinitionIdOrKey,
+        CancellationToken cancellationToken = default
+    )
+    {
+        DecisionDefinitionDiagramDto? definitionXml;
+
+        try
+        {
+            definitionXml = await client.GetDecisionDefinitionDmnXmlByIdAsync(
+                decisionDefinitionIdOrKey,
+                cancellationToken
+            );
+        }
+        catch (Exception idException)
+        {
+            logger.LogWarning(
+                idException,
+                "Failed to get decision definition XML by id: {DecisionDefinitionIdOrKey}. Trying by key.",
+                decisionDefinitionIdOrKey
+            );
+
+            try
+            {
+                definitionXml = await client.GetDecisionDefinitionDmnXmlByKeyAsync(
+                    decisionDefinitionIdOrKey,
+                    cancellationToken
+                );
+            }
+            catch (Exception keyException)
+            {
+                logger.LogError(
+                    keyException,
+                    "Failed to get decision definition XML by id or key: {DecisionDefinitionIdOrKey}",
+                    decisionDefinitionIdOrKey
+                );
+
+                return Failure(
+                    "Failed to get decision definition XML, because: " + keyException.Message
+                );
+            }
+        }
+
+        return Frame(
+            $"""
+            <dmn_definition_xml>
+                <definition_id>{definitionXml.Id}</definition_id>
+                <xml><![CDATA[{EscapeCData(definitionXml.DmnXml)}]]></xml>
+            </dmn_definition_xml>
+            """
+        );
+    }
+
     private async Task<ProcessInstanceDto?> GetProcessInstanceAsync(
         string processInstanceIdOrBusinessKey,
         CancellationToken cancellationToken = default
@@ -1031,5 +1137,10 @@ internal sealed class CamundaService(ICamundaClient client, ILogger<CamundaServi
                 </response>
             </mcp_server_response>
             """;
+    }
+
+    private static string EscapeCData(string? value)
+    {
+        return value?.Replace("]]>", "]]]]><![CDATA[>") ?? string.Empty;
     }
 }
