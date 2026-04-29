@@ -18,6 +18,10 @@ This repository provides a powerful set of tools to interact with the Camunda 7 
 | `count_incidents`  | Count variables of the selected Camunda process.            |
 | `list_user_tasks`  | Lists user tasks of the selected Camunda process.           |
 | `count_user_tasks` | Count user tasks of the selected Camunda process.           |
+| `complete_user_task` | Completes a user task using its task id.                  |
+| `send_message` | Sends a message to a process instance (by instance id or business key). |
+| `get_definition_xml` | Retrieves BPMN 2.0 XML for a process definition by id or key. |
+| `get_decision_definition_xml` | Retrieves DMN XML for a decision definition by id or key. |
 | `resolve_incident` | Requests the Camunda process engine to resolve an incident. |
 
 ### 🐳 Run the server with Docker
